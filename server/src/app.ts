@@ -7,9 +7,9 @@ const app = express()
 const server = createServer(app)
 
 const io = new Server(server, {
-  // cors: {
-  //   origin: "http://localhost:3000/"
-  // }
+  cors: {
+    origin: "http://localhost:3000"
+  }
 })
 
 const setupSocket = () => {
@@ -18,7 +18,7 @@ const setupSocket = () => {
   })
 }
 
-// setupSocket()
+setupSocket()
 
 // server.listen(8001, () => {
 //   console.log("server listening on port", 8001)

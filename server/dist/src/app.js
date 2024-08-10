@@ -21,9 +21,9 @@ exports.app = app;
 const server = (0, http_1.createServer)(app);
 exports.server = server;
 const io = new socket_io_1.Server(server, {
-// cors: {
-//   origin: "http://localhost:3000/"
-// }
+    cors: {
+        origin: "http://localhost:3000"
+    }
 });
 exports.io = io;
 const setupSocket = () => {
@@ -31,3 +31,4 @@ const setupSocket = () => {
         console.log("client is connected", socket.id);
     }));
 };
+setupSocket();
