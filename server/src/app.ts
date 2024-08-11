@@ -8,7 +8,7 @@ const server = createServer(app)
 
 const io = new Server(server, {
   cors: {
-    origin: "https://client-production-081a.up.railway.app",
+    origin: "https://courteous-passion-production.up.railway.app/",
     methods: ['GET', 'POST']
   }
 })
