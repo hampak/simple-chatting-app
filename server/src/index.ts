@@ -21,7 +21,8 @@ app.use(morgan("common"))
 // app.use(bodyParser.json())
 // app.use(bodyParser.urlencoded({ extended: false }))
 app.use(cors({
-  origin: "https://client-production-081a.up.railway.app/"
+  origin: "https://client-production-081a.up.railway.app",
+  methods: ['GET', 'POST']
 }))
 
 // routes
