@@ -4,42 +4,62 @@ import { socket } from "./utils/io"
 type Messages = {
   name: string
   message: string
-  createdAt: Date
-  userId: string | undefined
+  createdAt?: Date
+  userId?: string | undefined
+  type: string
 }
 
 function App() {
 
   const [isConnected, setIsConnected] = useState(socket.connected)
   const [name, setName] = useState<string | null>(null)
-  // const [userId, setUserId] = useState<string | undefined>(undefined)
   const [input, setInput] = useState("")
   const [messages, setMessages] = useState<Messages[]>([])
 
   console.log(messages)
 
   const askName = () => {
-    const data = prompt("Please Enter youre name to begin - manner chatting please!")
-    setName(data)
+    const data = prompt("Please enter your name to begin - manner chatting please!")
+
+    if (data) {
+      socket.emit("register", data)
+      setName(data)
+    } else {
+      alert("Name cannot be blank")
+      askName()
+    }
   }
 
   useEffect(() => {
 
-
     socket.on('connect', () => {
       setIsConnected(true)
       console.log("connected", socket.id)
-      // setUserId(socket.id)
+    })
+
+    if (!name) {
       askName()
-    })
-    socket.on('disconnet', () => {
+    }
 
+    socket.on('message', (message) => {
+      // console.log(message.data.name)
+      setMessages((prevState) => prevState.concat(message))
     })
 
-    // return () => {
-    //   socket.off('connect', onConnect);
-    //   socket.off('disconnect', onDisconnect);
-    // };
+    socket.on('welcomeMessage', (welcomeMessage) => {
+      setMessages((prevState) => prevState.concat(welcomeMessage))
+    })
+
+    return () => {
+      socket.off('connect', () => {
+        setIsConnected(false)
+      });
+      socket.off("message")
+      socket.off("welcomeMessage")
+      // socket.off('disconnect', () => {
+      //   setIsConnected(false)
+      // });
+    };
   }, [])
 
 
@@ -48,9 +68,9 @@ function App() {
 
     e.preventDefault()
 
-    if (!name) {
-      return askName()
-    }
+    // if (!name) {
+    //   return askName()
+    // }
 
     if (input.trim() === "") return
 
@@ -58,11 +78,14 @@ function App() {
       name: name!,
       message: input,
       createdAt: new Date(),
-      userId: socket.id
+      userId: socket.id,
+      type: "normal"
     }
 
-    setMessages((prevMessages) => [...prevMessages, newMessage])
+    socket.emit('sendMessage', newMessage)
     setInput("")
+
+    // setMessages((prevMessages) => [...prevMessages, newMessage])
   }
 
   return (
@@ -90,29 +113,67 @@ function App() {
             messages.map((m, index) => (
               <>
                 {
-                  m.userId === socket.id ? (
-                    <div
-                      key={index}
-                      className="flex justify-end"
-                    >
-                      <div
-                        className="inline-flex justify-end p-2 rounded-md bg-blue-500 max-w-[200px] break-words flex-col text-white"
-                      >
-                        <span className="text-xs underline">{m.name}</span>
-                        <p className="text-sm">{m.message}</p>
-                      </div>
-                    </div>
+                  m.type === "normal" ? (
+                    <>
+                      {
+                        m.userId === socket.id ? (
+                          <div
+                            key={index}
+                            className="flex flex-col items-end"
+                          >
+                            <div
+                              className="inline-flex justify-end p-2 rounded-md bg-blue-500 max-w-[200px] break-words flex-col text-white space-y-1"
+                            >
+                              <span className="text-xs underline">{m.name}</span>
+                              <p className="text-sm">{m.message}</p>
+                            </div>
+                            <p className="text-xs text-gray-500">
+                              {
+                                new Date(m.createdAt!).toLocaleTimeString("en-US", {
+                                  hour: "2-digit",
+                                  minute: "2-digit",
+                                  hour12: false,
+                                  timeZone: "Asia/Seoul"
+                                })
+                              }
+                            </p>
+                          </div>
+                        ) : (
+                          <div
+                            key={index}
+                            className="flex flex-col items-start"
+                          >
+                            <div
+                              className="inline-flex justify-start p-2 rounded-md bg-gray-300 max-w-[200px] break-words flex-col text-black space-y-1"
+                            >
+                              <span className="text-xs underline">{m.name}</span>
+                              <p className="text-sm">{m.message}</p>
+                            </div>
+                            <p className="text-xs text-gray-500">
+                              {
+                                new Date(m.createdAt!).toLocaleTimeString("en-US", {
+                                  hour: "2-digit",
+                                  minute: "2-digit",
+                                  hour12: false,
+                                  timeZone: "Asia/Seoul"
+                                })
+                              }
+                            </p>
+                          </div>
+                        )
+                      }
+                    </>
                   ) : (
-                    <div
-                      key={index}
-                      className="flex justify-end"
-                    >
+                    <>
                       <div
-                        className="inline-flex justify-end p-2 rounded-md bg-gray-200 max-w-[200px] break-words"
+                        key={index}
+                        className="w-full flex justify-center"
                       >
-                        <p>{m.message}</p>
+                        <p className="bg-gray-400 text-white text-full px-2 rounded-lg text-sm">
+                          {m.name} has joined the chat!
+                        </p>
                       </div>
-                    </div>
+                    </>
                   )
                 }
               </>
