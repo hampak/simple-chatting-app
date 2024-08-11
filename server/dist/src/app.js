@@ -31,6 +31,7 @@ io.on("connection", (socket) => {
     console.log("client is connected", socket.id);
     socket.on("register", (userName) => __awaiter(void 0, void 0, void 0, function* () {
         try {
+            socket.data.userName = userName;
             const welcomeMessage = {
                 message: `${userName} has entered the chat`,
                 name: userName,
@@ -50,4 +51,14 @@ io.on("connection", (socket) => {
         catch (error) {
         }
     }));
+    socket.on("disconnect", () => {
+        const userName = socket.data.userName;
+        console.log("user is disconnected", userName);
+        const disconnectMessage = {
+            message: `${userName} has left the chat`,
+            name: userName,
+            type: "system"
+        };
+        io.emit("disconnectUser", disconnectMessage);
+    });
 });

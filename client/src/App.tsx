@@ -9,12 +9,18 @@ type Messages = {
   type: string
 }
 
+// type Users = {
+//   name: string,
+//   userId?: string | undefined
+// }
+
 function App() {
 
   const [isConnected, setIsConnected] = useState(socket.connected)
   const [name, setName] = useState<string | null>(null)
   const [input, setInput] = useState("")
   const [messages, setMessages] = useState<Messages[]>([])
+  // const [activeUsers, setActiveUsers] = useState<Users | Users[]>([])
 
   console.log(messages)
 
@@ -50,15 +56,15 @@ function App() {
       setMessages((prevState) => prevState.concat(welcomeMessage))
     })
 
+    socket.on("disconnectUser", (disconnectMessage) => {
+      setMessages((prevState) => prevState.concat(disconnectMessage))
+    })
+
     return () => {
-      socket.off('connect', () => {
-        setIsConnected(false)
-      });
+      socket.off('connect');
       socket.off("message")
       socket.off("welcomeMessage")
-      // socket.off('disconnect', () => {
-      //   setIsConnected(false)
-      // });
+      socket.off('disconnectUser');
     };
   }, [])
 
@@ -67,10 +73,6 @@ function App() {
   const onSend = (e: React.FormEvent<HTMLFormElement>) => {
 
     e.preventDefault()
-
-    // if (!name) {
-    //   return askName()
-    // }
 
     if (input.trim() === "") return
 
@@ -84,8 +86,6 @@ function App() {
 
     socket.emit('sendMessage', newMessage)
     setInput("")
-
-    // setMessages((prevMessages) => [...prevMessages, newMessage])
   }
 
   return (
@@ -170,7 +170,11 @@ function App() {
                         className="w-full flex justify-center"
                       >
                         <p className="bg-gray-400 text-white text-full px-2 rounded-lg text-sm">
-                          {m.name} has joined the chat!
+                          {
+                            m.name === undefined ? "" : (
+                              <>{m.message}</>
+                            )
+                          }
                         </p>
                       </div>
                     </>
