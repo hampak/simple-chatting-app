@@ -9,20 +9,12 @@ type Messages = {
   type: string
 }
 
-// type Users = {
-//   name: string,
-//   userId?: string | undefined
-// }
-
 function App() {
 
   const [isConnected, setIsConnected] = useState(socket.connected)
   const [name, setName] = useState<string | null>(null)
   const [input, setInput] = useState("")
   const [messages, setMessages] = useState<Messages[]>([])
-  // const [activeUsers, setActiveUsers] = useState<Users | Users[]>([])
-
-  console.log(messages)
 
   const askName = () => {
     const data = prompt("Please enter your name to begin - manner chatting please!")
@@ -40,7 +32,7 @@ function App() {
 
     socket.on('connect', () => {
       setIsConnected(true)
-      console.log("connected", socket.id)
+      console.log("connected", socket.id) // check to see if the socket connection gets established.
     })
 
     if (!name) {
@@ -48,7 +40,6 @@ function App() {
     }
 
     socket.on('message', (message) => {
-      // console.log(message.data.name)
       setMessages((prevState) => prevState.concat(message))
     })
 

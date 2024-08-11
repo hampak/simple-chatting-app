@@ -1,6 +1,3 @@
 import io from "socket.io-client";
 
-// const uri = import.meta.env.VITE_STATUS === "development" ? "http://localhost:8000" : "https://server-production-982c.up.railway.app/"
-
-export const socket = io("https://server-production-982c.up.railway.app/")
-// export const socket = io(undefined)
+export const socket = io("http://localhost:8000") // set it to the port your server is running on.
