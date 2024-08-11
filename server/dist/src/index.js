@@ -16,29 +16,40 @@ const express_1 = __importDefault(require("express"));
 const dotenv_1 = __importDefault(require("dotenv"));
 const cors_1 = __importDefault(require("cors"));
 const morgan_1 = __importDefault(require("morgan"));
-const app_1 = require("./app");
+const http_1 = require("http");
+const socket_io_1 = require("socket.io");
+const app = (0, express_1.default)();
+const server = (0, http_1.createServer)(app);
+const io = new socket_io_1.Server(server, {
+    cors: {
+        origin: "http://localhost:5173"
+    }
+});
+// import { app } from "./app";
 // route imports
 // import dashboardRoutes from "./routes/dashboardRoutes"
 // configurations
 dotenv_1.default.config();
-app_1.app.use(express_1.default.json());
+app.use(express_1.default.json());
 // app.use(helmet())
 // app.use(helmet.crossOriginResourcePolicy({
 //   policy: "cross-origin"
 // }))
-app_1.app.use((0, morgan_1.default)("common"));
+app.use((0, morgan_1.default)("common"));
 // app.use(bodyParser.json())
 // app.use(bodyParser.urlencoded({ extended: false }))
-app_1.app.use((0, cors_1.default)());
+app.use((0, cors_1.default)());
 // routes
 // app.use("/dashboard", dashboardRoutes) // http://localhost:8000/dashboard
-app_1.app.get("/", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    res.send({
-        message: "hello"
-    });
+app.get("/", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    res.send("Hello World");
 }));
+io.on('connection', (socket) => {
+    console.log("a user connected", socket.id);
+});
 // server
-const port = process.env.PORT || 3001;
-app_1.app.listen(port, () => {
+// const port = process.env.PORT || 3001;
+const port = 8000;
+server.listen(port, () => {
     console.log(`Server running on port ${port}`);
 });

@@ -4,8 +4,20 @@ import bodyParser from "body-parser";
 import cors from "cors"
 import helmet from "helmet";
 import morgan from "morgan";
+import { createServer } from "http";
+import { Server } from "socket.io";
 
-import { app } from "./app";
+
+const app = express()
+const server = createServer(app)
+
+const io = new Server(server, {
+  cors: {
+    origin: "http://localhost:5173"
+  }
+})
+
+// import { app } from "./app";
 
 // route imports
 // import dashboardRoutes from "./routes/dashboardRoutes"
@@ -27,13 +39,16 @@ app.use(cors())
 // routes
 // app.use("/dashboard", dashboardRoutes) // http://localhost:8000/dashboard
 app.get("/", async (req, res) => {
-  res.send({
-    message: "hello"
-  })
+  res.send("Hello World")
+})
+
+io.on('connection', (socket) => {
+  console.log("a user connected", socket.id)
 })
 
 // server
-const port = process.env.PORT || 3001;
-app.listen(port, () => {
+// const port = process.env.PORT || 3001;
+const port = 8000
+server.listen(port, () => {
   console.log(`Server running on port ${port}`)
 })
